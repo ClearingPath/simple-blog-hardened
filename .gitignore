@@ -1,2 +1,5 @@
 #exclude .idea
 .idea
+
+#ignore db.php
+db.php

@@ -49,27 +49,20 @@
         <nav class="art-list">
           <ul class="art-list-body">
             <?php
-              //open connection to mysql
-              $con=mysqli_connect("localhost","root","12345","simple_blog");
+                  //open connection to mysql
+                  require 'db.php';
 
-              //Connection error checking
-              if (mysqli_connect_errno()){
-                echo "Failed to connect to MySQL: " . mysqli_connect_error();
-              }
-              else{
-                $sql = mysqli_query($con,"SELECT * FROM post ORDER BY post_id desc");
-                while($row = mysqli_fetch_array($sql)) {
-                  echo "<li class='art-list-item'>";
-                  echo "<div class='art-list-item-title-and-time'>";
-                  echo "<h2 class='art-list-title'><a href='post.php?id=". $row['post_id'] ."'>" . $row['judul'] . "</a></h2>";
-                  echo "<div class='art-list-time'>" . $row['tanggal'] . "</div>";
-                  echo "<div class='art-list-time'><span style='color:#F40034;'>&#10029;</span> Featured</div>";
-                  echo "</div>";
-                  echo "<p>" . $row['konten'] . "</p>";
-                  echo "<p> <a href='edit_post.php?id=". $row['post_id'] . "'>Edit</a> | <a href='deletepost.php?id=". $row['post_id'] ."' onclick='return confirmDelete()'>Hapus</a> ";
-                  echo "</li>";
+                foreach($pdo->query('SELECT * FROM post ORDER BY post_id desc') as $row) {
+                    echo "<li class='art-list-item'>";
+                    echo "<div class='art-list-item-title-and-time'>";
+                    echo "<h2 class='art-list-title'><a href='post.php?id=" . $row['post_id'] . "'>" . $row['judul'] . "</a></h2>";
+                    echo "<div class='art-list-time'>" . $row['tanggal'] . "</div>";
+                    echo "<div class='art-list-time'><span style='color:#F40034;'>&#10029;</span> Featured</div>";
+                    echo "</div>";
+                    echo "<p>" . $row['konten'] . "</p>";
+                    echo "<p> <a href='edit_post.php?id=" . $row['post_id'] . "'>Edit</a> | <a href='deletepost.php?id=" . $row['post_id'] . "' onclick='return confirmDelete()'>Hapus</a> ";
+                    echo "</li>";
                 }
-              }
             ?>
           </ul>
         </nav>
