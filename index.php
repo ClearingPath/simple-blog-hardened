@@ -35,6 +35,11 @@
 </head>
 
 <body class="default">
+
+<?php
+    /* starting a session */
+    session_start();
+?>
 <div class="wrapper">
 
 <nav class="nav">
