@@ -39,6 +39,8 @@
 <?php
     /* starting a session */
     session_start();
+
+    require 'members.php';
 ?>
 <div class="wrapper">
 

@@ -3,20 +3,20 @@
  * Created by PhpStorm.
  * User: root
  * Date: 2/24/16
- * Time: 8:10 AM
+ * Time: 8:30 AM
  */
 /*** begin our session ***/
 session_start();
 
-/*** first check that both the username, password and form token have been sent ***/
-if(!isset( $_POST['username'], $_POST['password'], $_POST['form_token']))
+/*** check if the users is already logged in ***/
+if(isset( $_SESSION['id'] ))
+{
+    $message = 'Users is already logged in';
+}
+/*** check that both the username, password have been submitted ***/
+if(!isset( $_POST['username'], $_POST['password']))
 {
     $message = 'Please enter a valid username and password';
-}
-/*** check the form token is valid ***/
-elseif( $_POST['form_token'] != $_SESSION['form_token'])
-{
-    $message = 'Invalid form submission';
 }
 /*** check the username is the correct length ***/
 elseif (strlen( $_POST['username']) > 20 || strlen($_POST['username']) < 4)
@@ -24,7 +24,7 @@ elseif (strlen( $_POST['username']) > 20 || strlen($_POST['username']) < 4)
     $message = 'Incorrect Length for Username';
 }
 /*** check the password is the correct length ***/
-elseif (strlen( $_POST['password']) > 40 || strlen($_POST['password']) < 4)
+elseif (strlen( $_POST['password']) > 20 || strlen($_POST['password']) < 4)
 {
     $message = 'Incorrect Length for Password';
 }
@@ -57,8 +57,9 @@ else
         /*** set the error mode to excptions ***/
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        /*** prepare the insert ***/
-        $stmt = $pdo->prepare("INSERT INTO users (username, password ) VALUES (:username, :password )");
+        /*** prepare the select statement ***/
+        $stmt = $pdo->prepare("SELECT id, username, password FROM users
+                    WHERE username = :username AND password = :password");
 
         /*** bind the parameters ***/
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
@@ -67,24 +68,30 @@ else
         /*** execute the prepared statement ***/
         $stmt->execute();
 
-        /*** unset the form token session variable ***/
-        unset( $_SESSION['form_token'] );
+        /*** check for a result ***/
+        $id = $stmt->fetchColumn();
 
-        /*** if all is done, say thanks ***/
-        $message = 'New user added';
+        /*** if we have no result then fail boat ***/
+        if($id == false)
+        {
+            $message = 'Login Failed';
+        }
+        /*** if we do have a result, all is well ***/
+        else
+        {
+            /*** set the session user_id variable ***/
+            $_SESSION['id'] = $id;
+
+            /*** tell the user we are logged in ***/
+            $message = 'You are now logged in';
+        }
+
+
     }
     catch(Exception $e)
     {
-        /*** check if the username already exists ***/
-        if( $e->getCode() == 23000)
-        {
-            $message = 'Username already exists';
-        }
-        else
-        {
-            /*** if we are here, something has gone wrong with the database ***/
-            $message = 'We are unable to process your request. Please try again later"';
-        }
+        /*** if we are here, something has gone wrong with the database ***/
+        $message = 'We are unable to process your request. Please try again later"';
     }
 }
 ?>
